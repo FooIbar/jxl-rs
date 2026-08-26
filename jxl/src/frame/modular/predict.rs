@@ -481,16 +481,10 @@ impl WeightedPredictorState {
         let sum_wn = te_n + te_w;
         let te_ne = self.error[pos_ne] as i64;
 
-        let mut p = te_w;
-        if te_n.abs() > p.abs() {
-            p = te_n;
-        }
-        if te_nw.abs() > p.abs() {
-            p = te_nw;
-        }
-        if te_ne.abs() > p.abs() {
-            p = te_ne;
-        }
+        let p = [te_w, te_n, te_nw, te_ne]
+            .into_iter()
+            .reduce(|acc, x| if x.abs() > acc.abs() { x } else { acc })
+            .unwrap();
 
         self.prediction[0] = w + ne - n;
         self.prediction[1] = n - (((sum_wn + te_ne) * self.wp_header.p1c as i64) >> 5);
